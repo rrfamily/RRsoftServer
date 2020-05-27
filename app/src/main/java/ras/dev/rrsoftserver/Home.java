@@ -1,11 +1,14 @@
 package ras.dev.rrsoftserver;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -15,9 +18,13 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.rengwuxian.materialedittext.MaterialEditText;
 import com.squareup.picasso.Picasso;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.view.GravityCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -43,11 +50,17 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     //Firebase
     FirebaseDatabase database;
     DatabaseReference categories;
+    FirebaseStorage storage;
+    StorageReference storageReference;
     FirebaseRecyclerAdapter<Category, MenuViewHolder> adapter;
 
     //VIew
     RecyclerView recycler_menu;
     RecyclerView.LayoutManager layoutManager;
+
+    //Add New Menu Layout
+    MaterialEditText edtName;
+    Button btnUpload,btnSelect;
 
 
 
@@ -62,6 +75,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         //init Firebase
         database = FirebaseDatabase.getInstance();
         categories = database.getReference("Category");
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
 
 
 
@@ -69,8 +84,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                showDialog();
             }
         });
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -103,42 +117,88 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
     }
 
+    private void showDialog() {
+
+        AlertDialog.Builder alertDiaglog = new AlertDialog.Builder(Home.this);
+        alertDiaglog.setTitle("Add new Category");
+        alertDiaglog.setMessage("Please fill informations");
+
+
+        LayoutInflater inflater = this.getLayoutInflater();
+        View add_menu_layout = inflater.inflate(R.layout.add_new_menu_layout,null);
+
+        edtName = add_menu_layout.findViewById(R.id.edtName);
+        btnSelect = add_menu_layout.findViewById(R.id.btnSelect);
+        btnUpload = add_menu_layout.findViewById(R.id.btnUpload);
+
+        alertDiaglog.setView(add_menu_layout);
+        alertDiaglog.setIcon(R.drawable.ic_shopping_cart_black_24dp);
+
+
+        //Set Button
+        alertDiaglog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        alertDiaglog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+
+
+            }
+        });
+        alertDiaglog.show();
+    }
+
+
     private void loadMenu() {
 
-        FirebaseRecyclerOptions<Category> options = new FirebaseRecyclerOptions.Builder<Category>().setQuery(categories, Category.class).build();
+        FirebaseRecyclerOptions<Category> options = new FirebaseRecyclerOptions.Builder<Category>().setQuery(categories,Category.class).build();
 
-        adapter = new FirebaseRecyclerAdapter<Category, MenuViewHolder>(options) {
-            @NonNull
-            @Override
-            public MenuViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                return null;
-            }
-            //<Category, MenuViewHolder>
-            //Category.class,R.layout.menu_item,MenuViewHolder.class,category
+    adapter = new FirebaseRecyclerAdapter<Category, MenuViewHolder>(options) {
+        //<Category, MenuViewHolder>
+        //Category.class,R.layout.menu_item,MenuViewHolder.class,category
 
-            @Override
-            protected void onBindViewHolder(@NonNull MenuViewHolder viewHolder, int position, @NonNull Category model) {
-                viewHolder.txtMenuName.setText(model.getName());
-                Picasso.with(getBaseContext()).load(model.getImage()).into(viewHolder.imageView); //changed from imageViee
+        @Override
+        protected void onBindViewHolder(@NonNull MenuViewHolder viewHolder, int position, @NonNull Category model) {
+            viewHolder.txtMenuName.setText(model.getName());
+            Picasso.with(getBaseContext()).load(model.getImage()).into(viewHolder.imageView); //changed from imageViee
 
-               /* final Category productList = model;
-                viewHolder.setItemClickListener(new ItemClickListener() {
-                    @Override
-                    public void onClick(View view, int position, boolean isLongClick) {
-                        //get category and sent to activity
+           /* final Category productList = model;
+            viewHolder.set  ItemClickListener(new ItemClickListener() {
+                @Override
+                public void onClick(View view, int position, boolean isLongClick) {
+                    //get category and sent to activity
 
-                        Intent productList = new Intent(Home.this, ProductList.class);
-                        //CategoryiD is key
-                        productList.putExtra("CategoryID", adapter.getRef(position).getKey());
-                        startActivity(productList);
+                    Intent productList = new Intent(Home.this,ProductList.class);
+                    //CategoryiD is key
+                    productList.putExtra("CategoryID",adapter.getRef(position).getKey());
+                    startActivity(productList);
 
-                    }
-                });*/
-            }
-        };
+                }
+            });*/
+
+        }
+
+
+        @NonNull
+        @Override
+        public MenuViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.menu_item,parent,false);
+            return new MenuViewHolder(view);
+
+        }
+    };
+
+        adapter.startListening();
         adapter.notifyDataSetChanged();
         recycler_menu.setAdapter(adapter);
-    }
+
+}
 
 
     @Override
