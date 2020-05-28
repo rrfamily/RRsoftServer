@@ -283,7 +283,15 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             viewHolder.setItemClickListener(new ItemClickListener() {
                 @Override
                 public void onClick(View view, int position, boolean isLongClick) {
-                        //codelater
+
+                    //send category id and start new activity
+
+                    Intent productList = new Intent(Home.this,ProductList.class);
+                    productList.putExtra("CategoryId",adapter.getRef(position).getKey());
+
+                    startActivity(productList);
+
+
                 }
             });
 
