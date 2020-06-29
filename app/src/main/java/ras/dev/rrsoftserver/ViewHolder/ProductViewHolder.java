@@ -17,7 +17,7 @@ public class ProductViewHolder extends RecyclerView.ViewHolder implements View.O
 {
 
     public TextView product_name;
-    public ImageView  prodcut_image;
+    public ImageView  product_image;
 
     private ItemClickListener itemClickListener;
 
@@ -25,7 +25,7 @@ public class ProductViewHolder extends RecyclerView.ViewHolder implements View.O
         super(itemView);
 
         product_name = (TextView)itemView.findViewById(R.id.product_name);
-        prodcut_image = (ImageView)itemView.findViewById(R.id.product_image);
+        product_image = (ImageView)itemView.findViewById(R.id.product_image);
 
         itemView.setOnCreateContextMenuListener(this);
         itemView.setOnClickListener(this);
