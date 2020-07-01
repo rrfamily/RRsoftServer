@@ -104,6 +104,10 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         });
         drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
+
+        //navigationView = (NavigationView) findViewById(R.id.nav_view);
+       // navigationView.bringToFront();
+
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
@@ -355,15 +359,23 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 || super.onSupportNavigateUp();
     }
 
+
+    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
+
+
         int id = item.getItemId();
 
+        if(id == R.id.nav_order){
 
 
+            Intent orders = new Intent(Home.this,OrderStatus.class);
+            startActivity(orders);
 
 
+        }
 
         DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
